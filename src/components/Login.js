@@ -1,30 +1,48 @@
+import { BASE_URL } from "../config";
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      setErrorMsg('Both email and password are required');
+      setErrorMsg("Email and password are required.");
       return;
     }
 
-    setErrorMsg('');
-    alert('Login successful ✅');
-    navigate('/register'); // just redirecting somewhere
+    try {
+      const response = await fetch(`${BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Login successful ✅");
+        setEmail('');
+        setPassword('');
+        // You can redirect using navigate() if needed
+      } else {
+        setErrorMsg(data.message || "Login failed.");
+      }
+    } catch (error) {
+      setErrorMsg("Something went wrong. Please try again later.");
+    }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
       <div className="card p-4 shadow" style={{ width: '100%', maxWidth: '400px' }}>
         <h3 className="text-center mb-3">Login</h3>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSubmit}>
           {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
 
           <div className="mb-3">
