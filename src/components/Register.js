@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 function Register() {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
@@ -10,7 +11,7 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!email || !password || !role) {
+    if (!username || !email || !password || !role) {
       setErrorMsg('All fields are required.');
       setSuccessMsg('');
       return;
@@ -28,6 +29,19 @@ function Register() {
           {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
           {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
+          {/* Username Field */}
+          <div className="mb-3">
+            <label className="form-label">Username</label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+
+          {/* Email Field */}
           <div className="mb-3">
             <label className="form-label">Email address</label>
             <input
@@ -39,6 +53,7 @@ function Register() {
             />
           </div>
 
+          {/* Password Field */}
           <div className="mb-3">
             <label className="form-label">Password</label>
             <input
@@ -50,6 +65,7 @@ function Register() {
             />
           </div>
 
+          {/* Role Select */}
           <div className="mb-3">
             <label className="form-label">Select Role</label>
             <select
