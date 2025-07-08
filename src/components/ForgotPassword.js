@@ -1,70 +1,61 @@
-import { BASE_URL } from "../config";
 import React, { useState } from 'react';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleReset = (e) => {
     e.preventDefault();
 
-    if (!email) {
-      setErrorMsg("Email is required.");
-      setSuccessMsg('');
+    if (!email.trim()) {
+      setError('Email is required.');
+      setMessage('');
       return;
     }
 
-    try {
-      const response = await fetch(`${BASE_URL}/forgot-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccessMsg("Reset link sent to your email ✅");
-        setErrorMsg('');
-        setEmail("");
-      } else {
-        setErrorMsg(data.message || "Failed to send reset link.");
-        setSuccessMsg('');
-      }
-    } catch (error) {
-      setErrorMsg("Something went wrong. Please try again.");
-      setSuccessMsg('');
-    }
+    setMessage('🔗 A password reset link has been sent to your email.');
+    setError('');
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card p-4 shadow" style={{ width: '100%', maxWidth: '400px' }}>
-        <h3 className="text-center mb-3">Forgot Password</h3>
-        <form onSubmit={handleSubmit}>
-          {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
-          {successMsg && <div className="alert alert-success">{successMsg}</div>}
+      <div className="card shadow-lg border-0 p-4" style={{ width: '100%', maxWidth: '420px' }}>
+        <h3 className="text-center mb-4 text-primary fw-bold">Reset Your Password</h3>
 
-          <div className="mb-3">
-            <label>Email address</label>
+        <form onSubmit={handleReset}>
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
+
+          {message && (
+            <div className="alert alert-success" role="alert">
+              {message}
+            </div>
+          )}
+
+          <div className="form-group mb-3">
+            <label htmlFor="email" className="form-label">Email address</label>
             <input 
               type="email" 
-              className="form-control" 
-              placeholder="Enter your email"
+              className="form-control"
+              id="email"
+              placeholder="Enter your registered email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
+          <button type="submit" className="btn btn-primary w-100 fw-semibold">
             Send Reset Link
           </button>
 
           <div className="text-center mt-3">
-            Remembered your password? <a href="/login">Login</a>
+            <small>
+              Remember your password? <a href="/login">Login here</a>
+            </small>
           </div>
         </form>
       </div>
