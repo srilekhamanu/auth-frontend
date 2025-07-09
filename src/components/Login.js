@@ -1,27 +1,48 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+const BASE_URL = "https://auth-backend-n3pq.onrender.com/api/auth";
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
       setErrorMsg('Both email and password are required.');
-      setSuccessMsg('');
       return;
     }
 
-    setErrorMsg('');
-    setSuccessMsg('✅ Login successful!');
-    setTimeout(() => {
-      navigate('/register'); // just redirecting somewhere
-    }, 1000);
+    try {
+      const response = await fetch(`${BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('✅ Login successful!'); // ✅ Alert notification instead of green box
+        setErrorMsg('');
+        setEmail('');
+        setPassword('');
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+
+        // No redirect
+      } else {
+        setErrorMsg(data.error || 'Invalid credentials.');
+      }
+    } catch (error) {
+      setErrorMsg('Something went wrong. Please try again later.');
+    }
   };
 
   return (
@@ -30,7 +51,6 @@ function Login() {
         <h3 className="text-center mb-4 text-primary fw-bold">Login</h3>
         <form onSubmit={handleLogin}>
           {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
-          {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
           <div className="mb-3">
             <label className="form-label">Email address</label>

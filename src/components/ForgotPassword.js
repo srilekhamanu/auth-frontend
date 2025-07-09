@@ -1,21 +1,33 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import BASE_URL from '../config'; // Make sure this file exports: https://auth-backend-n3pq.onrender.com
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const handleReset = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
 
     if (!email.trim()) {
       setError('Email is required.');
-      setMessage('');
       return;
     }
 
-    setMessage('🔗 A password reset link has been sent to your email.');
-    setError('');
+    try {
+      const response = await axios.post(`${BASE_URL}/forgot-password`, {
+        email,
+      });
+
+      if (response.status === 200) {
+        alert('🔗 A password reset link has been sent to your email.');
+        setError('');
+        setEmail('');
+      }
+    } catch (err) {
+      const errMsg = err.response?.data?.error || 'Failed to send reset link.';
+      setError(errMsg);
+    }
   };
 
   return (
@@ -24,22 +36,12 @@ function ForgotPassword() {
         <h3 className="text-center mb-4 text-primary fw-bold">Reset Your Password</h3>
 
         <form onSubmit={handleReset}>
-          {error && (
-            <div className="alert alert-danger" role="alert">
-              {error}
-            </div>
-          )}
-
-          {message && (
-            <div className="alert alert-success" role="alert">
-              {message}
-            </div>
-          )}
+          {error && <div className="alert alert-danger">{error}</div>}
 
           <div className="form-group mb-3">
             <label htmlFor="email" className="form-label">Email address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               className="form-control"
               id="email"
               placeholder="Enter your registered email"

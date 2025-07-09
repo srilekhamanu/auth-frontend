@@ -1,24 +1,46 @@
 import React, { useState } from 'react';
 
+const BASE_URL = "https://auth-backend-n3pq.onrender.com/api/auth"; // ✅ Corrected path
+
 function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!username || !email || !password || !role) {
       setErrorMsg('All fields are required.');
-      setSuccessMsg('');
       return;
     }
 
-    setErrorMsg('');
-    setSuccessMsg('🎉 Registered successfully!');
+    try {
+      const response = await fetch(`${BASE_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password, role }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('🎉 Registered successfully!');
+        setErrorMsg('');
+        setUsername('');
+        setEmail('');
+        setPassword('');
+        setRole('');
+      } else {
+        setErrorMsg(data.error || 'Registration failed.');
+      }
+    } catch (error) {
+      setErrorMsg('Something went wrong. Please try again later.');
+    }
   };
 
   return (
@@ -27,9 +49,7 @@ function Register() {
         <h3 className="text-center mb-4 text-primary fw-bold">Create Account</h3>
         <form onSubmit={handleSubmit}>
           {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
-          {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
-          {/* Username Field */}
           <div className="mb-3">
             <label className="form-label">Username</label>
             <input
@@ -41,7 +61,6 @@ function Register() {
             />
           </div>
 
-          {/* Email Field */}
           <div className="mb-3">
             <label className="form-label">Email address</label>
             <input
@@ -53,7 +72,6 @@ function Register() {
             />
           </div>
 
-          {/* Password Field */}
           <div className="mb-3">
             <label className="form-label">Password</label>
             <input
@@ -65,7 +83,6 @@ function Register() {
             />
           </div>
 
-          {/* Role Select */}
           <div className="mb-3">
             <label className="form-label">Select Role</label>
             <select
@@ -74,12 +91,12 @@ function Register() {
               onChange={(e) => setRole(e.target.value)}
             >
               <option value="">Choose your role</option>
-              <option value="buyer">Buyer</option>
-              <option value="tenant">Tenant</option>
-              <option value="owner">Owner</option>
-              <option value="general">General User</option>
-              <option value="admin">Admin</option>
-              <option value="creator">Content Creator</option>
+              <option value="Buyer">Buyer</option>
+              <option value="Tenant">Tenant</option>
+              <option value="Owner">Owner</option>
+              <option value="General">General User</option>
+              <option value="Admin">Admin</option>
+              <option value="Content Creator">Content Creator</option>
             </select>
           </div>
 
